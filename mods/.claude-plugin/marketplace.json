@@ -1,0 +1,13 @@
+{
+  "name": "admin-kit-mods",
+  "owner": {
+    "name": "Admin Kit"
+  },
+  "plugins": [
+    {
+      "name": "admin-hud",
+      "source": "./admin-hud",
+      "description": "Status line under the prompt: model, cost, context and usage bars, tool activity and permission mode. Off by default; enable it if you want it in addition to or instead of claude-hud."
+    }
+  ]
+}

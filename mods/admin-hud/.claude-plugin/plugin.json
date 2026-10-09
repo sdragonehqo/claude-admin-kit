@@ -1,0 +1,6 @@
+{
+  "name": "admin-hud",
+  "version": "0.1.0",
+  "description": "A status line under the prompt: model badge, cost, context and usage bars, tool activity and the permission mode, drawn from session data and clickable. Configure it in admin-hud.json in the Claude folder.",
+  "types": "./types/index.d.ts"
+}

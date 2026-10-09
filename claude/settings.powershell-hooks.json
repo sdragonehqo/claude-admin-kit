@@ -1,0 +1,29 @@
+{
+  "_note": "Not loaded by Claude Code. Use these two hook entries in place of the hooks block in settings.json when the machine has PowerShell only (no Git for Windows). The shell field makes Claude Code run the command in PowerShell. JSON needs doubled backslashes.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "node \"$env:USERPROFILE\\.claude\\scripts\\style-reinforce.cjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "node \"$env:USERPROFILE\\.claude\\scripts\\style-reinforce.cjs\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}

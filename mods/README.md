@@ -1,0 +1,5 @@
+# Mods in this kit
+
+One mod is included: admin-hud, a status band under the prompt (model, cost, context, usage). It needs Claude Code 2.1.288 or newer; mods are on by default there and need no flag. It is disabled in settings.json so it does not duplicate claude-hud; set "admin-hud@admin-kit-mods" to true to use it. Windows behavior is UNVERIFIED (home folder is read through HOME, then USERPROFILE).
+
+Left out, and why: the developer-workspace chrome and its handoff command (developer concepts, hard-coded paths), the guard and spawn mods (git push, pull-request and subagent rules that do not apply to admin work), the style enforcer (fixed terse style and a fixed canary word, wrong for drafting proposals), the cmux Dock and context mods (cmux is macOS only), run targets, the pull-request deck, and the issue-tracker card (need developer tools or a tracker account the user does not have). The one optional mod is handoff-start; it needs a rewritten handoff command first and is not shipped.
