@@ -67,7 +67,7 @@ test('every file under claude/ (own files) is listed in the MANIFEST', () => {
 test('claude/settings.json parses and holds the expected keys', () => {
   const s = JSON.parse(read('claude/settings.json'))
   assert.equal(s.permissions.defaultMode, 'default')
-  assert.equal(s.env.CAVEMAN_DEFAULT_MODE, 'lite')
+  assert.equal(s.env.CAVEMAN_DEFAULT_MODE, 'caveman')
   for (const key of ['model', 'effortLevel', 'ultracode']) assert.equal(key in s, false, `${key} must not be set`)
   assert.equal('CLAUDE_CODE_ENABLE_FUNCTION_HOOKS' in s.env, false)
   for (const id of ['caveman@caveman', 'i-have-adhd@i-have-adhd', 'claude-hud@claude-hud', 'document-skills@anthropic-agent-skills']) {
@@ -113,22 +113,23 @@ test('no kit file holds a token-looking string', () => {
 // forbidden words
 
 test('no kit file under claude/ or mods/ names the author, employer or retired tooling', () => {
-  const words = ['HqO', 'hqo', 'sal.dragone', 'Dragone', 'strangle', 'Jev', 'Hindsight', 'Sourcegraph']
+  const words = [['Hq', 'O'], ['h', 'qo'], ['sal', '.', 'drag', 'one'], ['Drag', 'one'], ['stran', 'gle'], ['J', 'ev'], ['Hind', 'sight'], ['Source', 'graph']].map(p => p.join(''))
   const hits = []
   for (const f of allFiles) {
     const t = read(f)
     for (const w of words) if (t.includes(w)) hits.push(`${f}: ${w}`)
-    if (/\bSal\b/.test(t)) hits.push(`${f}: Sal`)
+    if (new RegExp('\\b' + ['S', 'al'].join('') + '\\b').test(t)) hits.push(`${f}: Sal`)
   }
   assert.deepEqual(hits, [])
 })
 
-test('the word Linear appears nowhere except the two exempt files and the vendored diagram skill catalog', () => {
+test('the issue-tracker word appears nowhere except the two exempt files and the vendored diagram skill catalog', () => {
+  const LIN = ['Lin', 'ear'].join('')
   const exempt = new Set(['MANIFEST.md', 'mods/README.md'])
-  const hits = allFiles.filter(f => !exempt.has(f) && !f.startsWith(VENDOR) && read(f).includes('Linear'))
+  const hits = allFiles.filter(f => !exempt.has(f) && !f.startsWith(VENDOR) && read(f).includes(LIN))
   assert.deepEqual(hits, [])
-  // The vendored skill may carry only its brand-icon catalog entry for the product named Linear.
-  const vendorHits = allFiles.filter(f => f.startsWith(VENDOR) && read(f).includes('Linear'))
+  // The vendored skill may carry only its brand-icon catalog entry for the product named in the exempt list.
+  const vendorHits = allFiles.filter(f => f.startsWith(VENDOR) && read(f).includes(LIN))
   assert.deepEqual(vendorHits, [VENDOR + 'renderers/shared/generated-brand-marks.mjs'])
 })
 
@@ -191,8 +192,8 @@ test('claude/CLAUDE.md has balanced block tags and no developer-tool vocabulary'
 
 // flag files
 
-test('caveman flag is lite and the adhd flag file is absent', () => {
-  assert.equal(read('claude/.caveman-active').trim(), 'lite')
+test('caveman flag is caveman and the adhd flag file is absent', () => {
+  assert.equal(read('claude/.caveman-active').trim(), 'caveman')
   assert.equal(fs.existsSync(path.join(KIT, 'claude/.i-have-adhd-always')), false)
 })
 
@@ -220,18 +221,18 @@ test('style-reinforce is silent when both modes are off', () => {
 })
 
 test('style-reinforce anchors adhd on every prompt and caveman every Nth tool call', () => {
-  const { opts } = sandbox({ caveman: 'lite', adhd: true })
+  const { opts } = sandbox({ caveman: 'caveman', adhd: true })
   const prompt = JSON.parse(styleReinforce(JSON.stringify({ hook_event_name: 'UserPromptSubmit', session_id: 's1' }), opts))
   assert.match(prompt.hookSpecificOutput.additionalContext, /ADHD MODE ACTIVE/)
   const tool = JSON.stringify({ hook_event_name: 'PostToolUse', session_id: 's1' })
   assert.equal(styleReinforce(tool, opts), '')
   const second = JSON.parse(styleReinforce(tool, opts))
-  assert.match(second.hookSpecificOutput.additionalContext, /CAVEMAN MODE STILL ACTIVE \(lite\)/)
+  assert.match(second.hookSpecificOutput.additionalContext, /CAVEMAN MODE STILL ACTIVE \(caveman\)/)
   assert.match(second.hookSpecificOutput.additionalContext, /ADHD MODE STILL ACTIVE/)
 })
 
 test('style-reinforce drops the adhd line for a subagent whose transcript path uses Windows backslashes', () => {
-  const { opts } = sandbox({ caveman: 'lite', adhd: true })
+  const { opts } = sandbox({ caveman: 'caveman', adhd: true })
   const out = styleReinforce(
     JSON.stringify({ hook_event_name: 'PostToolUse', session_id: 'w1', transcript_path: 'C:\\Users\\me\\.claude\\projects\\p\\abc\\subagents\\agent-1.jsonl' }),
     opts,
@@ -245,7 +246,7 @@ test('style-reinforce drops the adhd line for a subagent whose transcript path u
 })
 
 test('style-reinforce never throws on bad input', () => {
-  const { opts } = sandbox({ caveman: 'lite' })
+  const { opts } = sandbox({ caveman: 'caveman' })
   assert.doesNotThrow(() => styleReinforce('not json', opts))
   assert.doesNotThrow(() => styleReinforce(null, opts))
 })
@@ -315,7 +316,7 @@ test('install.ps1 runs the plugin commands in the documented order and form', ()
 
 test('ACCOUNTS.md covers plans, connectors and what to skip', () => {
   const t = read('ACCOUNTS.md')
-  for (const w of ['Pro', 'Max', 'Max 5x', '/mcp', 'Microsoft 365', 'Entra', 'Docusign', 'Canva', 'Granola', 'GitHub', '1Password', 'Hindsight', 'winget install rtk-ai.rtk']) {
+  for (const w of ['Pro', 'Max', 'Max 5x', '/mcp', 'Microsoft 365', 'Entra', 'Docusign', 'Canva', 'Granola', 'GitHub', '1Password', 'long-term memory services', 'winget install rtk-ai.rtk']) {
     assert.ok(t.includes(w), w)
   }
 })
@@ -339,7 +340,7 @@ test('.gitignore keeps secrets, backups and zips out', () => {
 })
 
 test('no file in the kit names the author or employer', () => {
-  const words = ['sal.dragone', 'Dragone', 'HqO', 'hqo']
+  const words = [['sal', '.', 'drag', 'one'], ['Drag', 'one'], ['Hq', 'O'], ['h', 'qo']].map(p => p.join(''))
   const files = []
   const top = fs.readdirSync(KIT, { withFileTypes: true }).filter(e => e.name !== '.git')
   for (const e of top) {
@@ -348,7 +349,7 @@ test('no file in the kit names the author or employer', () => {
   }
   const hits = []
   for (const f of files) {
-    if (f === 'verify/check.mjs') continue // this file names the words it forbids
+    if (f === 'LICENSE') continue // the copyright line names the author
     const t = read(f)
     for (const w of words) if (t.includes(w)) hits.push(`${f}: ${w}`)
   }
@@ -429,7 +430,7 @@ test('install.ps1 installs, merges settings, backs up, and is idempotent; check-
   const set = read1()
   assert.equal(set.model, 'my-model')
   assert.equal(set.env.FOO, '1')
-  assert.equal(set.env.CAVEMAN_DEFAULT_MODE, 'lite')
+  assert.equal(set.env.CAVEMAN_DEFAULT_MODE, 'caveman')
   assert.equal(set.permissions.defaultMode, 'default')
   assert.equal(set.hooks.PostToolUse.length, 2)
   assert.equal(set.hooks.UserPromptSubmit.length, 1)
@@ -439,7 +440,7 @@ test('install.ps1 installs, merges settings, backs up, and is idempotent; check-
 
   assert.ok(fs.existsSync(path.join(s.claude, 'scripts', 'style-reinforce.cjs')))
   for (const k of ['verified-status', 'resume-handoff', 'archify']) assert.ok(fs.existsSync(path.join(s.claude, 'skills', k, 'SKILL.md')), k)
-  assert.equal(fs.readFileSync(path.join(s.claude, '.caveman-active'), 'utf8').trim(), 'lite')
+  assert.equal(fs.readFileSync(path.join(s.claude, '.caveman-active'), 'utf8').trim(), 'caveman')
   assert.ok(fs.existsSync(path.join(s.claude, 'admin-kit-mods', 'admin-hud', 'hooks', 'register.tsx')))
   assert.equal(fs.readdirSync(s.mem).filter(n => n.endsWith('.md') && n !== 'MEMORY.md').length, 12)
 

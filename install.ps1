@@ -339,8 +339,8 @@ foreach ($pair in @(@('scripts\style-reinforce.cjs', 'scripts'), @('settings.pow
 $flagDst = Join-Path $ClaudeDir '.caveman-active'
 if ($prior) { Ok '.caveman-active left as you have it (not a first install)' }
 elseif (Test-Path -LiteralPath $flagDst) { Ok '.caveman-active already exists, kept' }
-elseif ($DryRun) { Plan "copy .caveman-active (level lite) to $flagDst" }
-else { Copy-Item -LiteralPath (Join-Path $ClaudeSrc '.caveman-active') -Destination $flagDst -Force; Ok 'caveman level set to lite' }
+elseif ($DryRun) { Plan "copy .caveman-active (level caveman) to $flagDst" }
+else { Copy-Item -LiteralPath (Join-Path $ClaudeSrc '.caveman-active') -Destination $flagDst -Force; Ok 'caveman level set to caveman (mildest)' }
 
 # skills
 foreach ($d in Get-ChildItem -LiteralPath (Join-Path $ClaudeSrc 'skills') -Directory) {
@@ -387,7 +387,7 @@ else { Ok "memory seeded in ${MemDir}: $added new files, $kept already there, $i
 
 Step '5 of 7' 'Plugins (this downloads from GitHub and can take a few minutes)'
 
-# The caveman pin keeps the level names lite, full and ultra. If a pin is refused, the newest version is used instead.
+# Pin attempt: Claude Code refuses a commit hash after # (only a branch or tag name works), so the newest version is used. The kit defaults (level caveman) match caveman 3.2.0.
 $CavemanPin = 'JuliusBrussee/caveman#766dce6b1394ebb56a3090748d5a0240a5aefb36'
 $Markets = @(
   @{ Name = 'caveman'; Source = 'JuliusBrussee/caveman'; Pin = $CavemanPin },
@@ -415,7 +415,7 @@ else {
     $code = 1
     if ($m.Pin) {
       $code = Invoke-Live 'claude' @('plugin', 'marketplace', 'add', $m.Pin)
-      if ($code -ne 0) { Warn "Could not pin $($m.Name) to the tested version; using the newest instead. If the caveman level lite does not exist, type /caveman and pick a level it lists." }
+      if ($code -ne 0) { Warn "Could not pin $($m.Name) to a fixed version; using the newest instead. Level names depend on the version. The kit default is caveman (mildest); if it is not accepted, type /caveman status and use a level it lists." }
     }
     if ($code -ne 0) { $code = Invoke-Live 'claude' @('plugin', 'marketplace', 'add', $m.Source) }
     if ($code -eq 0) { Ok "marketplace $($m.Name) added" }

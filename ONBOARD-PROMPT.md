@@ -18,11 +18,11 @@ Explain in two sentences: ADHD shaping makes replies start with the next action,
 - No: make sure that file does not exist (delete it if it does). Tell them they can switch it on any time by typing `/i-have-adhd`.
 
 Step 3. Caveman level.
-Explain in two sentences: caveman makes replies shorter. Levels are lite (default: no filler, normal sentences), full (terse fragments) and ultra (very terse), or off. Ask which they want.
-- lite: change nothing. It is already the default.
-- full or ultra: write that single word into the file `.caveman-active` in the Claude folder (replace its contents), and set `CAVEMAN_DEFAULT_MODE` to that word in the `env` section of `settings.json` in the Claude folder. Change only that one key.
+Explain in two sentences: caveman makes replies shorter. Levels are caveman (default, the mildest: no filler, normal sentences), ultracave (terse fragments) and megacave (very terse), or off. Ask which they want.
+- caveman: change nothing. It is already the default.
+- ultracave or megacave: write that single word into the file `.caveman-active` in the Claude folder (replace its contents), and set `CAVEMAN_DEFAULT_MODE` to that word in the `env` section of `settings.json` in the Claude folder. Change only that one key.
 - off: delete `.caveman-active` (write no level), and set `CAVEMAN_DEFAULT_MODE` to `off` in the `env` section of `settings.json`. Change only that one key.
-Tell them the new level applies from the next start of Claude. They can type `/caveman full` or `stop caveman` at any time.
+Tell them the new level applies from the next start of Claude. They can type `/ultracave` or `stop caveman` at any time.
 
 Step 4. Connect your tools.
 Tell the person to type `/mcp` themselves (only they can type a slash command) and describe or paste what they see. Explain: tools they connected at claude.ai under Customize, then Connectors, show up here automatically when they are signed in with their Claude account. Then ask which of these they use, and walk through the ones they say yes to, one at a time:

@@ -98,7 +98,7 @@ Only if you want Claude to build or convert Word, Excel, PowerPoint or PDF files
 | `CLAUDE.md` rules | The house rules Claude reads every session: reply with your name first, give times in your time zone, say "UNVERIFIED" when it has not checked something, never print secrets, look things up before asking you, take sensible defaults after you approve. |
 | `settings.json` | Claude Code's settings: it asks permission before risky actions, turns on the plugins below, and runs the style hook. |
 | Style hook (`style-reinforce.cjs`) | Reminds Claude of your chosen reply styles every so often so they do not fade in long sessions. Needs Node.js. |
-| caveman plugin | Makes replies shorter. Level lite by default. |
+| caveman plugin | Makes replies shorter. Its level names depend on the version. The kit installs the newest caveman (3.2.0), whose levels are `caveman` (mildest, the default), `ultracave` and `megacave`. Older versions called them lite, full and ultra. |
 | i-have-adhd plugin | Shapes replies: next action first, short numbered steps, one small closing action. Off until you turn it on. |
 | claude-hud plugin | A status line showing model, usage and context. Needs `/claude-hud:setup` once. |
 | document-skills plugin | Anthropic's skills for Word (.docx), Excel (.xlsx), PowerPoint (.pptx) and PDF files. |
@@ -117,7 +117,7 @@ Type these to Claude, in the chat:
 | You type | What happens |
 |---|---|
 | `stop caveman` | Replies go back to normal length |
-| `/caveman lite` (or `full`, `ultra`) | Change the shortness level |
+| `/caveman`, `/ultracave` or `/megacave` | Change the shortness level (`/caveman status` shows the current one; the old names lite, full and ultra still work as aliases) |
 | `/i-have-adhd` | ADHD shaping on for this session |
 | `stop adhd mode` | ADHD shaping off |
 | `normal mode` | Both styles off |
@@ -178,5 +178,13 @@ If you had no CLAUDE.md or settings.json before the kit, there is nothing to res
 | Claude's first word is not your name | Run the install step again, then start a new Claude session. |
 | A plugin failed to install | The installer prints the exact command to retry. Check your internet and run it. |
 | A `FAIL` from the check | The line under it says the fix. |
+| Settings look wrong or a `__KIT_MODS_DIR__` shows up | `settings.json` must be installed through `install.ps1`; it holds a placeholder the installer fills in. Do not copy the file by hand. |
+| Hooks do nothing without Git for Windows | Hook behaviour in PowerShell alone is untested. Git for Windows is the safer path: `winget install Git.Git`. |
+
+## Tested on
+
+Tested with PowerShell 7 on macOS using a fake `claude` shim. Windows PowerShell 5.1 and a real Windows machine are not yet tested. The memory folder name on Windows is inferred, not confirmed. Plugin install prompts may appear on first run.
+
+License: MIT
 
 More: [ACCOUNTS.md](ACCOUNTS.md) for plans, costs and connectors. [MANIFEST.md](MANIFEST.md) lists every file. [mods/README.md](mods/README.md) explains the optional mod.

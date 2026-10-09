@@ -11,10 +11,10 @@ Two destination forms are given. Windows: `%USERPROFILE%\.claude\...`. Git Bash:
 | File in kit | Windows destination | Git Bash destination | What it does | Need |
 |---|---|---|---|---|
 | `claude/CLAUDE.md` | `%USERPROFILE%\.claude\CLAUDE.md` | `~/.claude/CLAUDE.md` | The global rules: precedence, canary word, optional caveman and adhd-shape styles with switches, admin-work defaults, memory, secrets, verify-before-claiming, Windows environment notes. | required |
-| `claude/settings.json` | `%USERPROFILE%\.claude\settings.json` (merge into any existing file) | `~/.claude/settings.json` | Permission mode default, caveman default level lite, the style-reinforce hooks, plugin enablement and marketplace sources. | required |
+| `claude/settings.json` | `%USERPROFILE%\.claude\settings.json` (merge into any existing file) | `~/.claude/settings.json` | Permission mode default, caveman default level caveman (its mildest), the style-reinforce hooks, plugin enablement and marketplace sources. | required |
 | `claude/settings.powershell-hooks.json` | `%USERPROFILE%\.claude\settings.powershell-hooks.json` (reference only, never loaded) | `~/.claude/settings.powershell-hooks.json` | The same two hooks written for PowerShell-only machines (no Git for Windows). Copy its `hooks` block over the one in settings.json. | optional |
 | `claude/scripts/style-reinforce.cjs` | `%USERPROFILE%\.claude\scripts\style-reinforce.cjs` | `~/.claude/scripts/style-reinforce.cjs` | Hook that re-anchors the caveman and adhd-shape styles every tenth tool call. Node only. | required |
-| `claude/.caveman-active` | `%USERPROFILE%\.claude\.caveman-active` | `~/.claude/.caveman-active` | Flag file holding the caveman level (`lite`). Delete it or run "stop caveman" to turn caveman off. | required |
+| `claude/.caveman-active` | `%USERPROFILE%\.claude\.caveman-active` | `~/.claude/.caveman-active` | Flag file holding the caveman level (`caveman`). Delete it or run "stop caveman" to turn caveman off. | required |
 | `claude/skills/verified-status/` | `%USERPROFILE%\.claude\skills\verified-status\` | `~/.claude/skills/verified-status/` | Skill: status reports as claim, check, result, with UNVERIFIED labels. | required |
 | `claude/skills/resume-handoff/` | `%USERPROFILE%\.claude\skills\resume-handoff\` | `~/.claude/skills/resume-handoff/` | Skill: resume work from a handoff note, verifying the note against live state first. | required |
 | `claude/skills/archify/` | `%USERPROFILE%\.claude\skills\archify\` (real directory copy, not a symlink) | `~/.claude/skills/archify/` | Third-party skill (MIT): process, workflow, sequence and data-flow diagrams as standalone HTML. Needs Node on PATH. Examples and tests were left out. | optional |
@@ -38,11 +38,11 @@ Two destination forms are given. Windows: `%USERPROFILE%\.claude\...`. Git Bash:
 
 ## Plugins and marketplaces
 
-Versions are the ones this kit was prepared with. Claude Code installs the marketplace head unless a ref is given, so a newer version may install; see the caveman note below.
+Versions are the ones this kit was prepared with. Claude Code installs the marketplace head. `owner/repo#ref` accepts a branch or tag name, not a commit hash, so plugins are not pinned to a commit; see the caveman note below.
 
 | Plugin | Marketplace source | Pinned version | Needs | Need |
 |---|---|---|---|---|
-| `caveman@caveman` | GitHub `JuliusBrussee/caveman` | 766dce6b1394 (full commit 766dce6b1394ebb56a3090748d5a0240a5aefb36) | Node 18 or newer; Git Bash for its bash-form start hook | optional (style) |
+| `caveman@caveman` | GitHub `JuliusBrussee/caveman` | head of the marketplace (3.2.0 when the kit was prepared). A commit pin was tried and Claude Code refused it, see the caveman note below. | Node 18 or newer; Git Bash for its bash-form start hook | optional (style) |
 | `i-have-adhd@i-have-adhd` | GitHub `ayghri/i-have-adhd` | 0.2.0 (commit e7555fcaf612dfa1739dc86610ea926a906db614) | Node 18 or newer | optional (style, off until the flag file exists) |
 | `claude-hud@claude-hud` | GitHub `jarrodwatts/claude-hud` | 0.8.0 (commit 939eb66485832dead1b0a28a954f76f7aa2bdb06) | Node 18 or newer; Claude Code 2.1.260 or newer. After install run `/claude-hud:setup` once; it writes the statusLine entry for the machine's shell, so settings.json does not carry one. | optional |
 | `document-skills@anthropic-agent-skills` | GitHub `anthropics/skills` (public, no account) | no version published in the marketplace; head as of 2026-10-09 | Contains docx, xlsx, pptx and pdf skills. On Windows these may need Python 3 and Node on PATH, and LibreOffice for PDF conversion and formula recalculation. | required for documents |
@@ -51,7 +51,7 @@ Versions are the ones this kit was prepared with. Claude Code installs the marke
 
 Notes for the installer:
 
-- Newer upstream releases exist (caveman 3.2.0, i-have-adhd 0.4.1, claude-hud 0.10.0). In caveman 3.2.0 the level names changed to caveman, ultracave and megacave, so `lite` no longer exists there. The CLAUDE.md and settings.json in this kit assume the pinned caveman, which has lite, full and ultra.
+- Caveman 3.2.0 is the version this kit targets. Its level names are caveman (mildest, the kit default), ultracave and megacave. The old names still work as aliases (`lite` and `full` map to caveman, `ultra` to ultracave). Newer upstream releases of the other plugins may also install (i-have-adhd 0.4.1, claude-hud 0.10.0).
 - Install from the command line: `claude plugin marketplace add <owner/repo>` then `claude plugin install <plugin>@<marketplace>`. Mods need no enable flag on Claude Code 2.1.287 or newer; `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS` is ignored there and is not set.
 - If Git for Windows is installed in a non-standard place and Claude Code cannot find Git Bash, set `CLAUDE_CODE_GIT_BASH_PATH` to the full path of `bash.exe` in the `env` block of settings.json (for example `C:\\Program Files\\Git\\bin\\bash.exe`). Without Git for Windows at all, Claude Code uses PowerShell and the hooks in `settings.powershell-hooks.json` apply.
 - Left out on purpose: long-term memory services, usage-compression tooling (rtk), a password-manager launcher, orchestration and push-gate skills, and every mod except admin-hud. The docs worker may describe rtk and a password manager as optional extras.
